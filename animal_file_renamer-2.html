@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal File Name Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .instructions {
+            color: #666;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .progress-section {
+            margin-bottom: 30px;
+        }
+
+        .progress-item {
+            margin-bottom: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .progress-count {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .complete-btn {
+            width: 100%;
+            padding: 15px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .complete-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .complete-btn:active {
+            transform: translateY(0);
+        }
+
+        .complete-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .animal-selector {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        select:hover {
+            border-color: #667eea;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .files-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .file-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .file-row.completed {
+            background: #d1fae5;
+        }
+
+        .file-row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .file-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+        }
+
+        .done-btn {
+            padding: 10px 20px;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        .done-btn:hover {
+            background: #d97706;
+            transform: scale(1.05);
+        }
+
+        .done-btn:active {
+            transform: scale(0.95);
+        }
+
+        .done-btn.completed {
+            background: #10b981;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+            font-weight: 600;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+                    @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .file-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .copy-btn, .done-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Animal File Name Manager</h1>
+        <div class="instructions">
+            <strong>Instructions:</strong> Select an animal from the dropdown below. Click the copy button next to each file to copy its renamed filename to your clipboard. The description is shown for reference but won't be copied.
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">Current Animal Progress</span>
+                    <span class="progress-count" id="currentProgressCount">0 / 8 files done</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="currentProgressBar" style="width: 0%">0%</div>
+                </div>
+            </div>
+            
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">Overall Progress (All Animals)</span>
+                    <span class="progress-count" id="overallProgressCount">0 / 152 files done (0 / 19 animals)</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="overallProgressBar" style="width: 0%">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="animal-selector">
+            <label for="animalSelect">Select Animal:</label>
+            <select id="animalSelect">
+                <option value="">-- Choose an animal --</option>
+                <option value="bandicoot">Bandicoot</option>
+                <option value="bilby">Bilby</option>
+                <option value="cockatoo">Cockatoo</option>
+                <option value="dingo">Dingo</option>
+                <option value="echidna">Echidna</option>
+                <option value="emu">Emu</option>
+                <option value="frill-necked lizard">Frill-necked Lizard</option>
+                <option value="kangaroo">Kangaroo</option>
+                <option value="numbat">Numbat</option>
+                <option value="sugar glider">Sugar Glider</option>
+                <option value="tree kangaroo">Tree Kangaroo</option>
+                <option value="wallaby">Wallaby</option>
+                <option value="kookaburra">Kookaburra</option>
+                <option value="ladybug">Ladybug</option>
+                <option value="penguin">Penguin</option>
+                <option value="platypus">Platypus</option>
+                <option value="quokka">Quokka</option>
+                <option value="tasmanian devil">Tasmanian Devil</option>
+                <option value="wombat">Wombat</option>
+            </select>
+        </div>
+
+        <div class="files-grid" id="filesGrid">
+            <!-- Files will be populated here -->
+        </div>
+
+        <button class="complete-btn" id="completeBtn" disabled>Complete Group</button>
+    </div>
+
+    <div class="notification" id="notification">Copied to clipboard!</div>
+
+    <script>
+        const fileDefinitions = [
+            { original: 'image1.png', description: 'Initial Kip image' },
+            { original: 'image2.png', description: 'Second Kip image (after first click)' },
+            { original: 'image3.png', description: 'Celebration image (at timer end)' },
+            { original: 'mp31.mp3', description: 'Background music during brushing (loops)' },
+            { original: 'mp32.mp3', description: 'Celebration sound at timer end (plays once)' },
+            { original: 'mp33.mp3', description: 'Sound when clicking image1 (plays once)' },
+            { original: 'mp34.mp3', description: 'Sound when clicking image2 (plays once)' },
+            { original: 'video1.mp4', description: 'Video during brushing' }
+        ];
+
+        const animals = [
+            'bandicoot', 'bilby', 'cockatoo', 'dingo', 'echidna', 'emu', 
+            'frill-necked lizard', 'kangaroo', 'numbat', 'sugar glider', 
+            'tree kangaroo', 'wallaby', 'kookaburra', 'ladybug', 'penguin', 
+            'platypus', 'quokka', 'tasmanian devil', 'wombat'
+        ];
+
+        const animalSelect = document.getElementById('animalSelect');
+        const filesGrid = document.getElementById('filesGrid');
+        const notification = document.getElementById('notification');
+        const completeBtn = document.getElementById('completeBtn');
+        const currentProgressBar = document.getElementById('currentProgressBar');
+        const currentProgressCount = document.getElementById('currentProgressCount');
+        const overallProgressBar = document.getElementById('overallProgressBar');
+        const overallProgressCount = document.getElementById('overallProgressCount');
+
+        // Track completed files per animal
+        let completedFiles = {};
+
+        function initializeAnimal(animal) {
+            if (!completedFiles[animal]) {
+                completedFiles[animal] = new Set();
+            }
+        }
+
+        function updateCurrentProgress() {
+            const selectedAnimal = animalSelect.value;
+            if (!selectedAnimal) {
+                currentProgressBar.style.width = '0%';
+                currentProgressBar.textContent = '0%';
+                currentProgressCount.textContent = '0 / 8 files done';
+                return;
+            }
+
+            initializeAnimal(selectedAnimal);
+            const completed = completedFiles[selectedAnimal].size;
+            const total = fileDefinitions.length;
+            const percentage = Math.round((completed / total) * 100);
+            
+            currentProgressBar.style.width = percentage + '%';
+            currentProgressBar.textContent = percentage + '%';
+            currentProgressCount.textContent = `${completed} / ${total} files done`;
+        }
+
+        function updateOverallProgress() {
+            let totalCompleted = 0;
+            animals.forEach(animal => {
+                if (completedFiles[animal]) {
+                    totalCompleted += completedFiles[animal].size;
+                }
+            });
+
+            const totalFiles = animals.length * fileDefinitions.length;
+            const percentage = Math.round((totalCompleted / totalFiles) * 100);
+            
+            // Count complete animals
+            let completeAnimals = 0;
+            animals.forEach(animal => {
+                if (completedFiles[animal] && completedFiles[animal].size === fileDefinitions.length) {
+                    completeAnimals++;
+                }
+            });
+
+            overallProgressBar.style.width = percentage + '%';
+            overallProgressBar.textContent = percentage + '%';
+            overallProgressCount.textContent = `${totalCompleted} / ${totalFiles} files done (${completeAnimals} / ${animals.length} animals)`;
+        }
+
+        function capitalizeAnimal(animal) {
+            return animal.split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        function updateCompleteButton() {
+            const selectedAnimal = animalSelect.value;
+            
+            if (!selectedAnimal) {
+                completeBtn.disabled = true;
+                completeBtn.textContent = 'Complete Group';
+                return;
+            }
+
+            const animalName = capitalizeAnimal(selectedAnimal);
+            initializeAnimal(selectedAnimal);
+            
+            const allDone = completedFiles[selectedAnimal].size === fileDefinitions.length;
+            
+            if (allDone) {
+                completeBtn.textContent = `✓ ${animalName} Complete`;
+                completeBtn.style.background = '#9ca3af';
+                completeBtn.disabled = true;
+            } else {
+                completeBtn.textContent = `Complete ${animalName} Group`;
+                completeBtn.style.background = '#10b981';
+                completeBtn.disabled = false;
+            }
+        }
+
+        function generateFileName(animal, originalFile) {
+            const extension = originalFile.split('.').pop();
+            const baseName = originalFile.split('.')[0];
+            return `${animal}.${baseName}.${extension}`;
+        }
+
+        function showNotification(message = 'Copied to clipboard!') {
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        async function copyToClipboard(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+                button.textContent = '✓ Copied!';
+                button.classList.add('copied');
+                showNotification();
+                
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                button.textContent = 'Error';
+            }
+        }
+
+        function toggleFileDone(animal, fileIndex, button, row) {
+            initializeAnimal(animal);
+            
+            if (completedFiles[animal].has(fileIndex)) {
+                completedFiles[animal].delete(fileIndex);
+                button.textContent = 'Done';
+                button.classList.remove('completed');
+                row.classList.remove('completed');
+            } else {
+                completedFiles[animal].add(fileIndex);
+                button.textContent = '✓ Done';
+                button.classList.add('completed');
+                row.classList.add('completed');
+            }
+            
+            updateCurrentProgress();
+            updateOverallProgress();
+            updateCompleteButton();
+        }
+
+        function updateFilesList() {
+            const selectedAnimal = animalSelect.value;
+            
+            if (!selectedAnimal) {
+                filesGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Please select an animal to see the file names</div>';
+                updateCompleteButton();
+                updateCurrentProgress();
+                return;
+            }
+
+            initializeAnimal(selectedAnimal);
+            filesGrid.innerHTML = '';
+            
+            fileDefinitions.forEach((file, index) => {
+                const newFileName = generateFileName(selectedAnimal, file.original);
+                const isDone = completedFiles[selectedAnimal].has(index);
+                
+                const row = document.createElement('div');
+                row.className = 'file-row' + (isDone ? ' completed' : '');
+                
+                row.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-name">${newFileName}</div>
+                        <div class="file-description">${file.description}</div>
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard('${newFileName}', this)">Copy</button>
+                    <button class="done-btn ${isDone ? 'completed' : ''}" onclick="toggleFileDone('${selectedAnimal}', ${index}, this, this.parentElement)">${isDone ? '✓ Done' : 'Done'}</button>
+                `;
+                
+                filesGrid.appendChild(row);
+            });
+
+            updateCompleteButton();
+            updateCurrentProgress();
+        }
+
+        completeBtn.addEventListener('click', () => {
+            const selectedAnimal = animalSelect.value;
+            if (!selectedAnimal) return;
+            
+            initializeAnimal(selectedAnimal);
+            
+            // Mark all files as done
+            fileDefinitions.forEach((file, index) => {
+                completedFiles[selectedAnimal].add(index);
+            });
+            
+            updateFilesList();
+            updateCurrentProgress();
+            updateOverallProgress();
+            updateCompleteButton();
+            showNotification(`${capitalizeAnimal(selectedAnimal)} group marked as complete!`);
+        });
+
+        animalSelect.addEventListener('change', updateFilesList);
+        
+        // Initialize
+        updateFilesList();
+        updateCurrentProgress();
+        updateOverallProgress();
+    </script>
+</body>
+</html>
